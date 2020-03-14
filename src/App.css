@@ -1,0 +1,58 @@
+.App {
+  text-align: center;
+}
+
+h1 {
+  position: absolute;
+  top: 0;
+  text-align: center;
+  width: 100%;
+  left: 0;
+  font-weight: 100;
+  font-size: 48px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input {
+  padding: 10px;
+  width: 250px;
+  font-size: 18px;
+  outline: none;
+  text-align: center;
+  border-radius: 5px;
+  box-shadow: none;
+  border: 1px solid #232323;
+}
+
+::placeholder {
+  color: #b1b1b1;
+  opacity: 0.4;
+}
+
+.block {
+  color: #f45d48;
+  font-size: 94px;
+  margin-bottom: 40px;
+}
+
+.loading {
+  font-weight: bold;
+  font-size: 18px;
+  height: 20px;
+}
+
+@media (max-width: 520px) {
+  h1 {
+    font-size: 40px;
+  }
+
+  .block {
+    font-size: 74px;
+  }
+}
