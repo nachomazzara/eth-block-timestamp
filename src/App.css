@@ -47,6 +47,14 @@ input {
   height: 20px;
 }
 
+.footer {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-weight: 800;
+  color: #f45d48;
+}
+
 @media (max-width: 520px) {
   h1 {
     font-size: 40px;

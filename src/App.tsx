@@ -57,6 +57,14 @@ function App() {
         placeholder={'latest | first | timestamp | date'}
         onChange={e => setTimestamp(e.target.value)}
       />
+      <a
+        className="footer"
+        href="https://github.com/nachomazzara/eth-block-timestamp"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {'< code />'}
+      </a>
     </div>
   )
 }
