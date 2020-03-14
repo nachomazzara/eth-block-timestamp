@@ -69,7 +69,7 @@ export default class Blocks {
     ) {
       await this.fillBlockTime()
     }
-    console.log('abbbbb')
+
     if (date === 'first' || (normalizedDate && normalizedDate < this.firstTimestamp!)) {
       return {
         block: 1,
@@ -77,13 +77,11 @@ export default class Blocks {
       }
     }
 
-    console.log(date, 'latest', date === 'latest')
     if (
       date === 'latest' ||
       (normalizedDate && (normalizedDate >= now ||
         normalizedDate > this.savedBlocks['latest'].timestamp))
     ) {
-      console.log('asdasd')
       return {
         block: await this.eth.getBlockNumber(),
         timestamp: this.savedBlocks['latest'].timestamp
