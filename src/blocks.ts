@@ -1,15 +1,7 @@
 import Web3 from 'web3'
-import { Eth } from 'web3-eth';
+import { provider } from 'web3-core'
 
-let provider
-
-if ((window as any).ethereum) {
-  provider = (window as any).ethereum
-} else {
-  provider = 'https://mainnet.infura.io/v3/02e880217a8b4077bc05fcab2ee1d922'
-}
-
-const web3 = new Web3(provider);
+import { Eth } from 'web3-eth'
 
 export type SavedBlock = {
   number: number
@@ -24,83 +16,93 @@ export type BlockResponse = {
 export default class Blocks {
   eth: Eth
   checkedBlocks: { [key: string]: number[] }
-  saveBlocks: boolean
   savedBlocks: { [key: string]: SavedBlock }
-  requests: number
   blockTime?: number
   firstTimestamp?: number
+  maxRequests: number
+  requests: number
 
-  constructor(save: boolean = true) {
-    this.eth = web3.eth
+  constructor(provider: provider) {
+    this.eth = new Web3(provider).eth
     this.checkedBlocks = {}
-    this.saveBlocks = save
     this.savedBlocks = {}
+    this.maxRequests = 0
     this.requests = 0
   }
 
   async fillBlockTime() {
-    let latest = await this.getBlockWrapper('latest')
-    let first = await this.getBlockWrapper(1)
+    const first = await this.getBlockWrapper(1)
+    const latest = await this.getBlockWrapper('latest')
 
     this.blockTime =
       (latest.timestamp - first.timestamp) / Number(latest.number) - 1
+
     this.firstTimestamp = first.timestamp
   }
 
-  async getDate(date: string, after: boolean = true): Promise<BlockResponse | null> {
-    const now = Date.now()
-    const dateAsNumber = Number(date)
-    const dateAsDate = Date.parse(date)
+  async getDate(date: string, after: boolean = true, maxRequest: number = 50): Promise<BlockResponse | null> {
+    this.maxRequests = maxRequest
+    this.requests = 0
 
-    let normalizedDate
+    try {
+      const now = Date.now()
+      const dateAsNumber = Number(date)
+      const dateAsDate = Date.parse(date)
 
-    if (!isNaN(dateAsNumber)) {
-      // timestamp
-      normalizedDate = dateAsNumber
-    } else if (!isNaN(dateAsDate)) {
-      // date
-      normalizedDate = dateAsDate / 1000
-    }
+      let normalizedDate
 
-
-    if (
-      typeof this.firstTimestamp === 'undefined' ||
-      typeof this.blockTime === 'undefined'
-    ) {
-      await this.fillBlockTime()
-    }
-
-    if (date === 'first' || (normalizedDate && normalizedDate < this.firstTimestamp!)) {
-      return {
-        block: 1,
-        timestamp: this.firstTimestamp!
+      if (!isNaN(dateAsNumber)) {
+        // timestamp
+        normalizedDate = dateAsNumber
+      } else if (!isNaN(dateAsDate)) {
+        // date
+        normalizedDate = dateAsDate / 1000
       }
-    }
 
-    if (
-      date === 'latest' ||
-      (normalizedDate && (normalizedDate >= now ||
-        normalizedDate > this.savedBlocks['latest'].timestamp))
-    ) {
-      return {
-        block: await this.eth.getBlockNumber(),
-        timestamp: this.savedBlocks['latest'].timestamp
+
+      if (
+        typeof this.firstTimestamp === 'undefined' ||
+        typeof this.blockTime === 'undefined'
+      ) {
+        await this.fillBlockTime()
       }
-    }
 
-    if (!normalizedDate) {
-      return null
-    }
+      if (date === 'first' || (normalizedDate && normalizedDate < this.firstTimestamp!)) {
+        return {
+          block: 1,
+          timestamp: this.firstTimestamp!
+        }
+      }
 
-    this.checkedBlocks[normalizedDate] = []
+      if (
+        date === 'latest' ||
+        (normalizedDate && (normalizedDate >= now ||
+          normalizedDate > this.savedBlocks['latest'].timestamp))
+      ) {
+        return {
+          block: await this.eth.getBlockNumber(),
+          timestamp: this.savedBlocks['latest'].timestamp
+        }
+      }
 
-    let predictedBlock = await this.getBlockWrapper(
-      Math.ceil((normalizedDate - this.firstTimestamp! / this.blockTime!) / 1000)
-    )
+      if (!normalizedDate) {
+        return null
+      }
 
-    return {
-      block: await this.findBetter(normalizedDate, predictedBlock, after),
-      timestamp: normalizedDate
+      this.checkedBlocks[normalizedDate] = []
+
+      let predictedBlock = await this.getBlockWrapper(
+        Math.ceil((normalizedDate - this.firstTimestamp! / this.blockTime!))
+      )
+
+      const block = await this.findBetter(normalizedDate, predictedBlock, after)
+
+      return {
+        timestamp: normalizedDate,
+        block
+      }
+    } catch (e) {
+      throw e
     }
   }
 
@@ -112,6 +114,10 @@ export default class Blocks {
   ): Promise<number> {
     if (await this.isBetterBlock(date, predictedBlock, after)) {
       return predictedBlock.number
+    }
+
+    if (this.requests >= this.maxRequests) {
+      throw new Error('Max requests limit reached')
     }
 
     const difference = date - predictedBlock.timestamp
@@ -168,7 +174,11 @@ export default class Blocks {
     let nextBlock = currentBlock + skip
 
     if (this.checkedBlocks[date].includes(nextBlock)) {
-      return this.getNextBlock(date, currentBlock, skip < 0 ? ++skip : --skip)
+      do {
+        nextBlock = nextBlock + skip
+      } while (this.checkedBlocks[date].includes(nextBlock))
+
+      return this.getNextBlock(date, nextBlock - skip, skip)
     }
 
     this.checkedBlocks[date].push(nextBlock)
@@ -177,17 +187,16 @@ export default class Blocks {
   }
 
   async getBlockWrapper(block: number | string): Promise<SavedBlock> {
-    if (!this.saveBlocks) {
-      const fetchedBlock = await this.eth.getBlock(block)
-
-      return {
-        number: fetchedBlock.number!,
-        timestamp: Number(fetchedBlock.timestamp)
-      }
-    }
-
     if (this.savedBlocks[block.toString()]) {
       return this.savedBlocks[block]
+    }
+
+    if (
+      typeof block === 'number' &&
+      this.savedBlocks['1'] &&
+      this.savedBlocks['1'].number >= block
+    ) {
+      return this.savedBlocks['1']
     }
 
     if (

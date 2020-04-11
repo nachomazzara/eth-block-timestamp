@@ -24,7 +24,7 @@ input {
   width: 250px;
   font-size: 18px;
   outline: none;
-  text-align: center;
+  text-align: left;
   border-radius: 5px;
   box-shadow: none;
   border: 1px solid #232323;
@@ -32,7 +32,7 @@ input {
 
 ::placeholder {
   color: #b1b1b1;
-  opacity: 0.4;
+  opacity: 0.3;
 }
 
 .block {

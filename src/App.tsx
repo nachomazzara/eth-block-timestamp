@@ -5,7 +5,15 @@ import useDebounce from './debounce'
 
 import './App.css'
 
-const blocks = new Blocks()
+let provider
+
+if ((window as any).ethereum) {
+  provider = (window as any).ethereum
+} else {
+  provider = 'https://mainnet.infura.io/v3/02e880217a8b4077bc05fcab2ee1d922'
+}
+
+const blocks = new Blocks(provider)
 
 function App() {
   const [timestamp, setTimestamp] = useState<string>()
@@ -20,12 +28,14 @@ function App() {
       if (provider && typeof provider.enable === 'function') {
         await provider.enable()
       }
+
       setIsLoading(true)
       let found
+
       try {
         found = await blocks.getDate('latest')
       } catch (e) {
-        // Do nothing
+        console.log(e.message)
       }
       setBlock(found ? found.block : 0)
       setIsLoading(false)
@@ -38,8 +48,14 @@ function App() {
     async function getBlock(timestamp?: string) {
       if (timestamp) {
         setIsLoading(true)
-        const found = await blocks.getDate(timestamp)
-        setBlock(found ? found.block : 0)
+        let found
+        try {
+          found = await blocks.getDate(timestamp)
+        } catch (e) {
+          console.log(e.message)
+        }
+
+        setBlock(found ? found.block : undefined)
         setIsLoading(false)
       }
     }
