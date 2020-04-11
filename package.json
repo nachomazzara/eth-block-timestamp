@@ -1,7 +1,7 @@
 {
   "name": "eth-block-timestamp",
-  "version": "0.0.0-development",
-  "private": true,
+  "version": "0.0.1",
+  "private": false,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
