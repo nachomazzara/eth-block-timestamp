@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "src/blocks.ts",
     "outDir": "dist",
     "module": "commonjs",
     "target": "es2017",
@@ -18,5 +18,6 @@
     "plugins": [{ "name": "tslint-language-service" }],
     "declaration": true
   },
-  "include": ["./src/blocks.ts"]
+  "include": ["./src/blocks.ts"],
+  "exclude": ["./node_modules"]
 }
