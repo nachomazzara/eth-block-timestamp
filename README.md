@@ -2,6 +2,9 @@
 
 > Get a block number by its date
 
+[![NPM version](https://badge.fury.io/js/eth-block-timestamp.svg)](https://npmjs.org/package/eth-block-timestamp@latest)
+[![Install Size](https://packagephobia.now.sh/badge?p=eth-block-timestamp@latest)](https://packagephobia.now.sh/result?p=eth-block-timestamp@latest)
+
 ## Demo -> https://blockbytime.com
 
 ## Install
