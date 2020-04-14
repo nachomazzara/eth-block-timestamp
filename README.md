@@ -16,6 +16,8 @@ npm i eth-block-timestamp
 ### Usage
 
 ```typescript
+import Blocks from 'eth-block-timestamp'
+
 const blocks = new Blocks(
   (window as any).ethereum || 'https://mainnet.infura.io/v3/{API_KEY}'
 )
