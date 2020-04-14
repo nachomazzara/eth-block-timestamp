@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import Blocks from './blocks'
+import Blocks from './lib/blocks'
 import useDebounce from './debounce'
 
 import './App.css'
@@ -66,7 +66,15 @@ function App() {
   return (
     <div className="App">
       <h1>{'Block Number By Date'}</h1>
-      <p className="block">{block}</p>
+      <p className="block">
+        <a
+          href={`https://etherscan.io/block/${block}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {block}
+        </a>
+      </p>
       <p className="loading">{isLoading ? 'Loading...' : null}</p>
       <input
         type="string"
