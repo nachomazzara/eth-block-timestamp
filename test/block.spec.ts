@@ -27,9 +27,9 @@ describe('Blocks', function () {
   })
 
   it('should get a block by date', async function () {
-    const found = await blocks.getDate('03/20/2020 03:10:00 AM')
+    const found = await blocks.getDate('03/20/2020 03:10:00 AM UTC+0')
 
-    expect(found!.block).to.be.equal(9706860)
-    expect(found!.timestamp).to.be.equal(1584684600)
+    expect(found!.block).to.be.equal(9706042)
+    expect(found!.timestamp).to.be.equal(1584673800)
   })
 })
