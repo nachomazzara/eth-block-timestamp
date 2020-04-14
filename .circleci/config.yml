@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test:
     docker:
       - image: circleci/node:8
 
@@ -19,6 +19,9 @@ jobs:
             - node_modules
           key: dependencies-{{ checksum "package-lock.json" }}
       - run:
+          name: Run tests
+          command: npm run test:lib
+      - run:
           name: Build library
           command: npm run build:lib
       - save_cache:
@@ -26,54 +29,8 @@ jobs:
             - dist
           key: dist-{{ .Branch }}-{{ .Revision }}
 
-  test:
-    docker:
-      - image: circleci/node:8-browsers
-        environment:
-          CHROME_BIN: '/usr/bin/google-chrome'
-      - image: ethereum/client-go
-        command: |
-          --identity="TEST_NODE"
-          --networkid="53611"
-          --rpc
-          --rpcaddr 0.0.0.0
-          --rpcapi admin,debug,eth,miner,net,personal,shh,txpool,web3
-          --ws
-          --wsaddr 0.0.0.0
-          --wsapi admin,debug,eth,miner,net,personal,shh,txpool,web3
-          --wsorigins "*"
-          --mine
-          --minerthreads=1
-          --dev
-
-    working_directory: /tmp/eth-block-timestamp
-
-    steps:
-      - checkout
-      - setup_remote_docker:
-          version: 17.05.0-ce
-      - restore_cache:
-          keys:
-            - dependencies-{{ checksum "package-lock.json" }}
-      - run:
-          name: Install node dependencies
-          command: npm install
-      - save_cache:
-          paths:
-            - node_modules
-          key: dependencies-{{ checksum "package-lock.json" }}
-      - restore_cache:
-          keys:
-            - dist-{{ .Branch }}-{{ .Revision }}
-      - run:
-          name: Run tests
-          command: npm run test:lib
-
 workflows:
   version: 2
-  test-build-release:
+  test:
     jobs:
-      - build
-      - test:
-          requires:
-            - build
+      - test
