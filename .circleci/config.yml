@@ -20,10 +20,10 @@ jobs:
           key: dependencies-{{ checksum "package-lock.json" }}
       - run:
           name: Run tests
-          command: npm run test:lib
+          command: npm run test
       - run:
           name: Build library
-          command: npm run build:lib
+          command: npm run build
       - save_cache:
           paths:
             - dist
