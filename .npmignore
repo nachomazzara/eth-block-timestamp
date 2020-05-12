@@ -1,6 +1,6 @@
-public
-src
+webapp
+lib
 node_modules
 now.json
-build
+test
 

@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
-import Block from '../src/lib/blocks'
+import Block from '../lib/blocks'
 
 chai.use(chaiAsPromised)
 

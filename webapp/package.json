@@ -1,20 +1,31 @@
 {
-  "name": "eth-block-timestamp",
-  "version": "0.0.6",
+  "name": "eth-block-timestamp-webapp",
+  "version": "0.0.1",
   "private": false,
-  "main": "dist/blocks.js",
-  "typings": "./dist/blocks.d.ts",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "@types/jest": "^24.9.1",
     "@types/node": "^12.12.30",
+    "@types/react": "^16.9.23",
+    "@types/react-dom": "^16.9.5",
     "bignumber.js": "^9.0.0",
+    "eth-block-timestamp": "0.0.6",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0",
+    "react-scripts": "3.4.0",
     "typescript": "^3.7.5",
     "web3": "^1.2.6"
   },
   "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "test": "nyc mocha --require ts-node/register test/*.spec.ts"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "prebuild": "rm -rf dist",
+    "build:lib": "tsc --project tsconfig-build-lib.json",
+    "test:lib": "nyc mocha --require ts-node/register test/*.spec.ts"
   },
   "eslintConfig": {
     "extends": "react-app"
