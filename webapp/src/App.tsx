@@ -11,7 +11,7 @@ let provider
 if ((window as any).ethereum) {
   provider = (window as any).ethereum
 } else {
-  provider = 'https://mainnet.infura.io/v3/02e880217a8b4077bc05fcab2ee1d922'
+  provider = 'https://mainnet.infura.io/v3/85bbcb55329846258cda4ad9734d2e1f'
 }
 
 const blocks = new Blocks(provider)
