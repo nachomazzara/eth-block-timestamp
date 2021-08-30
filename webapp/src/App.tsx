@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import Blocks from 'eth-block-timestamp'
 import useDebounce from './debounce'
+import { getNetworkNameById, getBaseLink } from './utils'
 
 import './App.css'
 
@@ -15,34 +16,21 @@ if ((window as any).ethereum) {
 
 const blocks = new Blocks(provider)
 
-export function getChains() {
-  return [
-    { value: 'mainnet', label: 'Ethereum Mainnet', id: '1' },
-    { value: 'ropsten', label: 'Ropsten Testnet', id: '3' },
-    { value: 'kovan', label: 'Kovan Testnet', id: '42' },
-    { value: 'rinkeby', label: 'Rinkeby Testnet', id: '4' },
-    { value: 'goerli', label: 'Goerli Testnet', id: '5' },
-  ]
-}
-
-export function getNetworkNameById(id: string): string {
-  const chain = getChains().find((chain) => chain.id === id)
-  return chain ? chain.value : ''
-}
-
 function App() {
   const [timestamp, setTimestamp] = useState<string>()
   const [isLoading, setIsLoading] = useState(false)
   const [block, setBlock] = useState<number>()
-  const [network, setNetwork] = useState(getNetworkNameById('1'))
+  const [network, setNetwork] = useState<string>()
+  const [account ,setAccounts] = useState<string[]>()
 
   const debouncedTimestamp = useDebounce(timestamp, 500)
 
   useEffect(() => {
     async function getLatestBlock() {
       const provider = (window as any).ethereum
-      if (provider && typeof provider.enable === 'function') {
-        await provider.enable()
+      if (provider && typeof provider.request === 'function') {
+        const res = await provider.request({ method: 'eth_requestAccounts' })
+        setAccounts(res)
       }
 
       setIsLoading(true)
@@ -86,17 +74,15 @@ function App() {
     }
 
     getNetwork()
-  }, [])
+  }, [account])
 
-  const link = `https://${
-    network !== 'mainnet' ? `${network}.` : ''
-  }etherscan.io/block/${block}`
+  const link = getBaseLink(network)
 
   return (
     <div className="App">
       <h1>{'Block Number By Date'}</h1>
       <p className="block">
-        <a href={link} target="_blank" rel="noopener noreferrer">
+        <a href={`${link}/block/${block}`} target="_blank" rel="noopener noreferrer">
           {block}
         </a>
       </p>
